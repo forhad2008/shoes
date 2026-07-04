@@ -148,7 +148,7 @@
         .hero-bg {
             width: 140%;
             height: 100%;
-            background: linear-gradient(rgba(107, 2, 2, 0.1), rgba(0, 0, 0, 0.5)), url('1793.png') center/cover no-repeat;
+            background: linear-gradient(rgba(107, 2, 2, 0.1), rgba(0, 0, 0, 0.5)), url('90.png') center/cover no-repeat;
             transform: scale(1.5);
         }
 
@@ -853,6 +853,41 @@
             transform: rotate(180deg);
         }
 
+        /* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin: 80px 0;
+}
+
+.page-btn {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-color);
+    border: 1px solid rgba(0,0,0,0.2);
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s var(--ease-editorial);
+}
+
+.page-btn:hover {
+    background: var(--text-color);
+    color: var(--white);
+    transform: translateY(-3px);
+}
+
+.page-btn.active {
+    background: var(--text-color);
+    color: var(--white);
+}
+
         footer {
             display: flex;
             justify-content: space-between;
@@ -1205,6 +1240,13 @@
         </div>
     </div>
 
+    <!-- Pagination -->
+    <div class="pagination">
+        <a href="index.html" class="page-btn active">1</a>
+        <a href="2.html" class="page-btn">2</a>
+        <a href="3.html" class="page-btn">3</a>
+    </div> 
+    
     <footer>
         <div class="footer-left">
             <h2>Contact Us(For Over 3000$ Deal)</h2>
@@ -1289,35 +1331,6 @@
             { id: "prod-18", title: "Boraldo Tortoise Edition Luxury Leather Shoes", price: 3850, badge: "Exclusive", image: "140.png", link: "140.png" },
             { id: "prod-19", title: "Boraldo Shark Edition Luxury Leather Shoes", price: 4850, badge: "Exclusive Limited(Only 540)", image: "150.png", link: "150.png" },
             { id: "prod-20", title: "Boraldo Gorilla Edition Luxury Leather Shoes", price: 3850, badge: "Classic", image: "160.png", link: "160.png" },
-            { id: "prod-21", title: "Boraldo Rhinoceros Edition Luxury Leather Shoes", price: 3850, badge: "Exclusive", image: "170.png", link: "170.png" },
-            { id: "prod-22", title: "Boraldo Galaxy A06", price: 4899, badge: "Classic Limited(Only 999)", image: "171.png", link: "171.png" },
-            { id: "prod-23", title: "Boraldo Monster Edition Beast Loafer Luxury Shoes", price: 4750, badge: "Premium", image: "172.png", link: "172.png" },
-            { id: "prod-24", title: "Boraldo Horror Edition Beast Loafer Luxury Shoes", price: 4899, badge: "Premium Limited(Only 900)", image: "173.png", link: "173.png" },
-            { id: "prod-25", title: "Boraldo Tiger Edition Beast Loafer Luxury Shoes", price: 4899, badge: "Premium Limited(Only 1025 )", image: "174.png", link: "174.png" },
-            { id: "prod-26", title: "Boraldo Orca Edition Beast Loafer Luxury Shoes", price: 4899, badge: "Premium Limited(Only 750)", image: "175.png", link: "175.png" },
-            { id: "prod-27", title: "Boraldo Penguin Edition Beast Loafer Luxury Shoes", price: 4850, badge: "Premium Limited(Only 850)", image: "176.png", link: "176.png" },
-            { id: "prod-28", title: "Boraldo Goldfish Edition Beast Loafer Luxury Shoes", price: 4850, badge: "Premium Limited(Only 825)", image: "177.png", link: "177.png" },
-            { id: "prod-29", title: "Boraldo Alien Edition Beast Loafer Luxury Shoes", price: 4999, badge: "Premium Limited(Only 999)", image: "178.png", link: "178.png" },
-            { id: "prod-30", title: "Boraldo Sea Crab Edition Beast Loafer Luxury Shoes", price: 4999, badge: "Premium Limited(Only 999)", image: "179.png", link: "179.png" },
-            { id: "prod-31", title: "Boraldo Snake Edition Beast Loafer Luxury Shoes", price: 4999, badge: "Premium Limited(Only 999)", image: "1791.png", link: "1791.png" },
-            { id: "prod-32", title: "Boraldo Peacock Edition Beast Loafer Luxury Shoes", price: 4999, badge: "Premium Limited(Only 999)", image: "1792.png", link: "1792.png" },
-            { id: "prod-33", title: "Boraldo Jelly-Fish Edition Beast Loafer Luxury Shoes", price: 4999, badge: "Premium Limited(Only 999)", image: "1793.png", link: "1793.png" },
-            { id: "prod-34", title: "Boraldo Rain-special Beast Loafer Luxury Shoes", price: 4999, badge: "Premium Limited(Only 999)", image: "1794.png", link: "1794.png" },
-            { id: "prod-35", title: "Boraldo Hippo Edition Beast Loafer Luxury Shoes", price: 4999, badge: "Premium Limited(Only 999)", image: "1795.png", link: "1795.png" },
-            { id: "prod-36", title: "Boraldo Ocean Monster Luxury Shoes", price: 5499, badge: "Iconic Limited(Only 499)", image: "1796.png", link: "1796.png" },
-            { id: "prod-37", title: "Boraldo Pirate Edition Luxury Shoes", price: 5225, badge: "Iconic Limited(Only 499)", image: "1797.png", link: "1797.png" },
-
-            { id: "prod-38", title: "Boraldo Horror Edition Luxury Shoes", price: 4899, badge: "Premium Limited(Only 1400)", image: "180.png", link: "180.png" },
-            { id: "prod-39", title: "Boraldo Ocean King Killer Whale Edition Luxury Shoes", price: 4999.99, badge: "Classic Limited(Only 999)", image: "181.png", link: "181.png" },
-            { id: "prod-40", title: "Boraldo Ocean King Octopus Edition Luxury Shoes", price: 4999.99, badge: "Classic Limited(Only 999)", image: "182.png", link: "182.png" },
-            { id: "prod-41", title: "Boraldo Ocean King Dragon Edition Luxury Shoes", price: 4999.99, badge: "Classic Limited(Only 999)", image: "183.png", link: "183.png" },
-            { id: "prod-42", title: "Boraldo Ocean King Crocodile Edition Luxury Shoes", price: 4999.99, badge: "Classic Limited(Only 999)", image: "184.png", link: "184.png" },
-            { id: "prod-43", title: "Boraldo Ocean King  Heaven Edition Luxury Shoes", price: 4999.99, badge: "Classic Limited(Only 999)", image: "185.png", link: "185.png" },
-            { id: "prod-44", title: "Boraldo Ocean King  Monarch King Edition Luxury Shoes", price: 4999.99, badge: "Classic Limited(Only 999)", image: "186.png", link: "186.png" },
-            { id: "prod-45", title: "Boraldo Panda Edition Classic Shoes", price: 2499, badge: "Classic Limited(Only 4000)", image: "pan.png", link: "pan.png" },
-                        { id: "prod-46", title: "Boraldo Football Edition Exclusive Shoes", price: 3899, badge: "Limited(Only 999)", image: "fot.png", link: "fot.png" },
-                                    { id: "prod-47", title: "Boraldo Moon Edition Exclusive Shoes", price: 3899, badge: "Limited(Only 999)", image: "moon.png", link: "moon.png" },
-
 
 
 
