@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boraldo Store</title>
-
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -1190,9 +1190,10 @@
 
 
         <nav class="drawer-menu">
-            <ul class="drawer-menu">
-                <li><a href="https://forhad2008.github.io/boraldo-store/">Home</a></li>
-
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" onclick="closeCart()">Our Story</a></li>
+        
                 <li class="has-submenu">
                     <button class="submenu-toggle-btn" onclick="toggleSubmenu(event)">
                         Explore Collection <span class="arrow">▼</span>
@@ -1200,19 +1201,27 @@
                     <ul class="submenu" id="explore-submenu">
                         <li><a href="shop.webp">Product Collection Demo</a></li>
                         <li><a href="bag.webp">Bag Collection</a></li>
-
+                        
                         <li><a href="index.html">Shoes Collection</a></li>
                         <li><a href="https://forhad2008.github.io/winter/">Winter Fashion</a></li>
-                                                                        <li><a href="https://forhad2008.github.io/watch/">Watch Collection</a></li>
+                        <li><a href="https://forhad2008.github.io/watch/">Watch Collection</a></li>
 
                     </ul>
                 </li>
+                <li><a href="https://forhad2008.github.io/Boraldo/page1.html">Explore T-shirts</a></li>
+        
                 <br> <br> <br>
                 <li><a href="https://www.facebook.com/profile.php?id=61580779565120" onclick="closeCart()">The
                         Founder</a></li>
                 <li><a href="https://forhad2008.github.io/portfolio/" onclick="closeCart()">About The Founder</a></li>
             </ul>
-        </nav>
+            <ul>
+                <button class="modal-cart-link-btn" onclick="openCartModal()">
+                    <span>Shopping Bag</span>
+                    <span class="modal-cart-count-badge" id="drawerCartCount">0</span>
+                </button>
+            </ul>
+</nav>
     </div>
 
     <div class="cart-modal-overlay" id="cartModal" onclick="closeCartModalOutside(event)">
@@ -1230,11 +1239,19 @@
                     <span id="cartTotalPrice">$0.00</span>
                 </div>
 
-                <form class="checkout-form" onsubmit="event.preventDefault(); alert('Order Placed Successfully!');">
-                    <input type="text" placeholder="Full Name" required>
-                    <input type="email" placeholder="Email Address" required>
-                    <input type="text" placeholder="Card Details" required>
-                    <button class="checkout-btn" type="submit">Complete Order</button>
+                <form class="checkout-form" id="checkoutForm">
+
+                    <input id="customerName" type="text" placeholder="Full Name" required>
+
+                    <input id="customerEmail" type="email" placeholder="Email Address" required>
+
+                    <input id="customerAddress" type="text" placeholder="Shipping Address" required>
+
+                    <input id="customerPhone" type="tel" placeholder="Phone Number" required>
+
+                    <button class="checkout-btn" type="submit">
+                        Complete Order
+                    </button>
                 </form>
             </div>
         </div>
@@ -1343,283 +1360,503 @@
 
         ];
 
-        let cart = JSON.parse(localStorage.getItem('threadlab_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem('threadlab_cart')) || [];
 
-        // Dynamic view logic depending on the group target parameter
-        function renderProductGrid(items, isLuxuryStyle = false) {
-            if (!isLuxuryStyle) {
-                // Return Standard Cards Grid Style layout markup 
+            // --- RENDER FUNCTIONS ---
+            function renderProductGrid(items, isLuxuryStyle = false) {
+                if (!isLuxuryStyle) {
+                    return items.map(p => `
+                        <div class="product-card">
+                            <div class="image-container">
+                                ${p.badge ? `<div class="badge">${p.badge}</div>` : ''}
+                                <a href="${p.link}"><img src="${p.image}" alt="${p.title}" class="product-image"></a>
+                            </div>
+                            <div class="product-info">
+                                <span class="product-title"><a href="${p.link}">${p.title}</a></span>
+                                <span class="product-price">$${p.price.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    return items.map((p, index) => `
+                        <div class="luxury-editorial-card ${index % 2 === 1 ? 'reverse' : ''}">
+                            <div class="lux-card-image-wrapper">
+                                ${p.badge ? `<div class="badge">${p.badge}</div>` : ''}
+                                <a href="${p.link}"><img src="${p.image}" alt="${p.title}"></a>
+                            </div>
+                            <div class="lux-card-details">
+                                <span class="lux-card-meta">Atelier Drop Exclusive</span>
+                                <h3 class="lux-card-title"><a href="${p.link}">${p.title}</a></h3>
+                                <p class="lux-card-price">$${p.price.toFixed(2)}</p>
+                                <button class="lux-add-btn" onclick="addToCart('${p.id}')">Acquire Shoes</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            function renderMarqueeItems(items) {
                 return items.map(p => `
-                    <div class="product-card">
-                        <div class="image-container">
-                            ${p.badge ? `<div class="badge">${p.badge}</div>` : ''}
-                            <a href="${p.link}"><img src="${p.image}" alt="${p.title}" class="product-image"></a>
-                        </div>
-                        <div class="product-info">
-                            <span class="product-title"><a href="${p.link}">${p.title}</a></span>
-                            <span class="product-price">$${p.price.toFixed(2)}</span>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                // Return Alternating Premium Editorial Layout markup
-                return items.map((p, index) => `
-                    <div class="luxury-editorial-card ${index % 2 === 1 ? 'reverse' : ''}">
-                        <div class="lux-card-image-wrapper">
+                    <div class="marquee-item">
+                        <div class="marquee-img-box">
                             ${p.badge ? `<div class="badge">${p.badge}</div>` : ''}
                             <a href="${p.link}"><img src="${p.image}" alt="${p.title}"></a>
                         </div>
-                        <div class="lux-card-details">
-                            <span class="lux-card-meta">Atelier Drop Exclusive</span>
-                            <h3 class="lux-card-title"><a href="${p.link}">${p.title}</a></h3>
-                            <p class="lux-card-price">$${p.price.toFixed(2)}</p>
-                            <button class="lux-add-btn" onclick="addToCart('${p.id}')">Acquire Silhouette</button>
+                        <div class="marquee-item-details">
+                            <h4>${p.title}</h4>
+                            <p>$${p.price.toFixed(2)}</p>
+                            <button class="lux-add-btn small-btn" onclick="addToCart('${p.id}')">Acquire</button>
                         </div>
                     </div>
                 `).join('');
             }
-        }
 
-        function initProducts() {
-            const grid1 = document.getElementById('product-grid');
-            const grid2 = document.getElementById('product-grid-extended');
+            function initProducts() {
+                const grid1 = document.getElementById('product-grid');
+                const grid2 = document.getElementById('product-grid-extended');
+                const watchTrack = document.getElementById('watch-marquee-track');
 
-            if (grid1) {
-                grid1.innerHTML = renderProductGrid(products.slice(0, 8), false);
+                if (grid1) grid1.innerHTML = renderProductGrid(products.slice(0, 4), false);
+                if (grid2) grid2.innerHTML = renderProductGrid(products.slice(4, 8), true);
+
+                if (watchTrack) {
+                    const watchItems = products.slice(8, 12);
+                    const marqueeHTML = renderMarqueeItems(watchItems);
+                    watchTrack.innerHTML = marqueeHTML + marqueeHTML; // Seamless duplication
+                }
             }
-            if (grid2) {
-                grid2.innerHTML = renderProductGrid(products.slice(8), true);
-            }
-        }
 
-        function addToCart(productId) {
-            const targetProduct = products.find(p => p.id === productId);
-            if (targetProduct) {
-                cart.push({
-                    id: targetProduct.id,
-                    title: targetProduct.title,
-                    price: targetProduct.price,
-                    size: 'M',
-                    color: 'Default'
-                });
+            // --- CART SYSTEM LOGIC ---
+            function addToCart(productId) {
+                const targetProduct = products.find(p => p.id === productId);
+                if (targetProduct) {
+                    cart.push({
+                        id: targetProduct.id,
+                        title: targetProduct.title,
+                        price: targetProduct.price,
+                        size: 'L',
+                        color: 'Default'
+                    });
+                    localStorage.setItem('threadlab_cart', JSON.stringify(cart));
+                    updateCartUI();
+                    openCartModal();
+                }
+            }
+
+            function removeFromCart(index) {
+                cart.splice(index, 1);
                 localStorage.setItem('threadlab_cart', JSON.stringify(cart));
                 updateCartUI();
-                openCartModal();
             }
-        }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            initProducts();
-            updateCartUI();
-        });
+            function updateCartUI() {
+                const headerCount = document.getElementById('cartCountHeader');
+                if (headerCount) headerCount.innerText = cart.length;
+                const drawerCount = document.getElementById("drawerCartCount");
+                if (drawerCount) drawerCount.innerText = cart.length;
 
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            const btn = event.currentTarget;
-            const submenu = document.getElementById('explore-submenu');
+                const listContainer = document.getElementById('cartItemList');
+                const totalContainer = document.getElementById('cartTotalPrice');
 
-            // Toggle active state classes
-            btn.classList.toggle('active');
-            submenu.classList.toggle('open');
-        }
-        function openCartModal() {
-            closeCart();
-            document.getElementById('cartModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
+                if (!listContainer) return;
 
-        function closeCartModal() {
-            document.getElementById('cartModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+                listContainer.innerHTML = "";
+                let totalPrice = 0;
 
-        function closeCartModalOutside(event) {
-            if (event.target.id === 'cartModal') {
-                closeCartModal();
+                if (cart.length === 0) {
+                    listContainer.innerHTML = "<p style='color: #888; text-align: center; padding: 20px 0;'>Your cart is currently empty.</p>";
+                } else {
+                    cart.forEach((item, index) => {
+                        totalPrice += item.price;
+                        listContainer.innerHTML += `
+                            <div class="cart-item">
+                                <div class="cart-item-info">
+                                    <strong>${item.title}</strong> <br>
+                                    <small>Size: ${item.size} | Color: ${item.color}</small>
+                                </div>
+                                <div class="cart-item-actions">
+                                    <span>$${item.price.toFixed(2)}</span>
+                                    <button class="remove-item-btn" onclick="removeFromCart(${index})">&times;</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                if (totalContainer) totalContainer.innerText = `$${totalPrice.toFixed(2)}`;
             }
-        }
 
-        function updateCartUI() {
-            document.getElementById('cartCountHeader').innerText = cart.length;
-            const drawerCount = document.getElementById('drawerCartCount');
-            if (drawerCount) drawerCount.innerText = cart.length;
+            // --- UI INTERACTIONS (MODALS & DRAWER) ---
+            function toggleSubmenu(event) {
+                event.preventDefault();
+                const btn = event.currentTarget;
+                const submenu = document.getElementById('explore-submenu');
+                btn.classList.toggle('active');
+                submenu.classList.toggle('open');
+            }
 
-            const listContainer = document.getElementById('cartItemList');
-            const totalContainer = document.getElementById('cartTotalPrice');
+            function openCartModal() {
+                closeCart();
+                document.getElementById('cartModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
 
-            if (!listContainer) return;
+            function closeCartModal() {
+                document.getElementById('cartModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
 
-            listContainer.innerHTML = "";
-            let totalPrice = 0;
+            function closeCartModalOutside(event) {
+                if (event.target.id === 'cartModal') {
+                    closeCartModal();
+                }
+            }
 
-            if (cart.length === 0) {
-                listContainer.innerHTML = "<p style='color: #888; text-align: center; padding: 20px 0;'>Your cart is currently empty.</p>";
-            } else {
-                cart.forEach((item, index) => {
-                    totalPrice += item.price;
-                    listContainer.innerHTML += `
-                        <div class="cart-item">
-                            <div class="cart-item-info">
-                                <strong>${item.name || item.title}</strong> <br>
-                                <small>Size: ${item.size || 'M'} | Color: ${item.color || 'Default'}</small>
-                            </div>
-                            <div class="cart-item-actions">
-                                <span>$${item.price.toFixed(2)}</span>
-                                <button class="remove-item-btn" onclick="removeFromCart(${index})">&times;</button>
-                            </div>
-                        </div>
-                    `;
+            function openCart() {
+                document.getElementById('cart-overlay').style.display = 'block';
+                gsap.to("#cart-overlay", { opacity: 1, duration: 0.4 });
+                gsap.to("#cart-panel", { x: '0%', duration: 0.6, ease: "power4.out" });
+                gsap.from(".drawer-menu li", { x: 30, opacity: 0, stagger: 0.08, duration: 0.6, ease: "power3.out", delay: 0.2 });
+            }
+
+            function closeCart() {
+                gsap.to("#cart-overlay", {
+                    opacity: 0, duration: 0.4, onComplete: () => {
+                        document.getElementById('cart-overlay').style.display = 'none';
+                    }
                 });
+                gsap.to("#cart-panel", { x: '100%', duration: 0.6, ease: "power4.inOut" });
             }
-            totalContainer.innerText = `$${totalPrice.toFixed(2)}`;
-        }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            localStorage.setItem('threadlab_cart', JSON.stringify(cart));
-            updateCartUI();
-        }
+            // --- GSAP ANIMATIONS & ENGINE CONTROL ---
+            gsap.registerPlugin(ScrollTrigger);
 
-        function openCart() {
-            document.getElementById('cart-overlay').style.display = 'block';
-            gsap.to("#cart-overlay", { opacity: 1, duration: 0.4 });
-            gsap.to("#cart-panel", { x: '0%', duration: 0.6, ease: "power4.out" });
-            gsap.from(".drawer-menu li", { x: 30, opacity: 0, stagger: 0.08, duration: 0.6, ease: "power3.out", delay: 0.2 });
-        }
+            window.addEventListener('DOMContentLoaded', () => {
+                initProducts();
+                updateCartUI();
 
-        function closeCart() {
-            gsap.to("#cart-overlay", {
-                opacity: 0, duration: 0.4, onComplete: () => {
-                    document.getElementById('cart-overlay').style.display = 'none';
+                // Main Entrance Landing Animation
+                const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+                tl.to("#hero-img", { scale: 1, duration: 2 })
+                    .from("header", { y: -100, opacity: 0, duration: 1.2 }, "-=1.5")
+                    .from("#hero-title", { yPercent: 100, duration: 1.4 }, "-=1")
+                    .to("#hero-subtitle", { opacity: 1, y: 0, duration: 1 }, "-=0.8")
+                    .to("#hero-btn", { opacity: 1, y: 0, duration: 1 }, "-=0.8");
+
+
+                // --- PRO-GRADE GSAP AUTO-PLAY MARQUEE WITH INTERACTION SMOOTHING ---
+                const watchTrack = document.getElementById("watch-marquee-track");
+
+                if (watchTrack) {
+                    watchTrack.style.cursor = "grab";
+                    watchTrack.parentNode.style.overflow = "hidden";
+
+                    let trackWidth = watchTrack.offsetWidth / 2;
+                    let currentX = 0;
+                    let isDragging = false;
+                    let startX = 0;
+                    let dragX = 0;
+                    let velocity = 0;
+                    let lastX = 0;
+                    let lastTime = 0;
+                    let animationFrameId = null;
+
+                    const baseAutoSpeed = -1.5; // পিক্সেল পার ফ্রেম অটো-প্লে স্পিড
+                    let currentSpeed = baseAutoSpeed;
+
+                    window.addEventListener('resize', () => {
+                        trackWidth = watchTrack.offsetWidth / 2;
+                    });
+
+                    const getEventX = (e) => e.touches ? e.touches[0].clientX : e.clientX;
+
+                    // মোমেন্টাম এবং গ্লাইড ইফেক্ট ইঞ্জিন লুপ
+                    function updateMarquee() {
+                        if (!isDragging) {
+                            currentSpeed += (baseAutoSpeed - currentSpeed) * 0.05; // স্পিড ডিকে বা স্মুথ ট্রানজিশন
+                            currentX += currentSpeed;
+                        } else {
+                            const now = performance.now();
+                            const elapsed = now - lastTime;
+                            if (elapsed > 0) {
+                                velocity = (currentX - lastX) / elapsed;
+                                lastX = currentX;
+                                lastTime = now;
+                            }
+                        }
+
+                        // সীমহীন বাউন্ডারি ম্যানেজমেন্ট
+                        if (currentX > 0) {
+                            currentX -= trackWidth;
+                            lastX -= trackWidth;
+                        } else if (currentX < -trackWidth) {
+                            currentX += trackWidth;
+                            lastX += trackWidth;
+                        }
+
+                        gsap.set(watchTrack, { x: currentX });
+                        animationFrameId = requestAnimationFrame(updateMarquee);
+                    }
+
+                    animationFrameId = requestAnimationFrame(updateMarquee);
+
+                    // ইভেন্ট লিসেনার হ্যান্ডলারসমূহ
+                    const dragStart = (e) => {
+                        isDragging = true;
+                        watchTrack.style.cursor = "grabbing";
+                        startX = getEventX(e);
+                        dragX = currentX;
+                        velocity = 0;
+                        lastX = currentX;
+                        lastTime = performance.now();
+                    };
+
+                    const dragMove = (e) => {
+                        if (!isDragging) return;
+                        const x = getEventX(e);
+                        const deltaX = x - startX;
+                        currentX = dragX + deltaX;
+                    };
+
+                    const dragEnd = () => {
+                        if (!isDragging) return;
+                        isDragging = false;
+                        watchTrack.style.cursor = "grab";
+
+                        currentSpeed = velocity * 16.66; // ইউজার ফ্লিক স্পিড ক্যালকুলেশন
+
+                        // বাউন্ডারি স্পিড ক্ল্যাম্প
+                        if (currentSpeed < -15) currentSpeed = -15;
+                        if (currentSpeed > 15) currentSpeed = 15;
+                    };
+
+                    // টাচ স্ক্রিন (মোবাইল)
+                    watchTrack.addEventListener("touchstart", dragStart, { passive: true });
+                    watchTrack.addEventListener("touchmove", dragMove, { passive: true });
+                    window.addEventListener("touchend", dragEnd);
+
+                    // মাউস অ্যাকশন (ডেস্কটপ)
+                    watchTrack.addEventListener("mousedown", dragStart);
+                    window.addEventListener("mousemove", dragMove);
+                    window.addEventListener("mouseup", dragEnd);
                 }
-            });
-            gsap.to("#cart-panel", { x: '100%', duration: 0.6, ease: "power4.inOut" });
-        }
+                // --- SCROLL CODE END ---
 
-        // --- GSAP ANIMATIONS ---
-        gsap.registerPlugin(ScrollTrigger);
 
-        window.addEventListener('DOMContentLoaded', () => {
-            // Main Entrance Landing Animation
-            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-            tl.to("#hero-img", { scale: 1, duration: 2 })
-                .from("header", { y: -100, opacity: 0, duration: 1.2 }, "-=1.5")
-                .from("#hero-title", { yPercent: 100, duration: 1.4 }, "-=1")
-                .to("#hero-subtitle", { opacity: 1, y: 0, duration: 1 }, "-=0.8")
-                .to("#hero-btn", { opacity: 1, y: 0, duration: 1 }, "-=0.8");
+                // Standard Collection Row entry stagger animation
+                gsap.to("#product-grid .product-card", {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1.2,
+                    stagger: 0.1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: "#product-grid",
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    }
+                });
 
-            // Standard Collection Row entry stagger animation
-            gsap.to("#product-grid .product-card", {
-                opacity: 1,
-                y: 0,
-                duration: 1.2,
-                stagger: 0.1,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: "#product-grid",
+                // Luxury Custom Layout collection entry trigger block
+                ScrollTrigger.batch(".luxury-editorial-card", {
                     start: "top 85%",
-                    toggleActions: "play none none none"
-                }
-            });
+                    onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, duration: 1.2, stagger: 0.2, ease: "power3.out" })
+                });
 
-            // Luxury Custom Layout collection entry trigger block
-            ScrollTrigger.batch(".luxury-editorial-card", {
-                start: "top 85%",
-                onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, duration: 1.2, stagger: 0.2, ease: "power3.out" })
-            });
+                // Parallax Fluid Background Effects
+                gsap.to("#luxury-fluid-bg", {
+                    yPercent: 15,
+                    scrollTrigger: {
+                        trigger: ".luxury-editorial-section",
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
+                    }
+                });
 
-            // --- LUXURY SECTION INTERACTIVE ANIMATIONS ---
-            gsap.to("#luxury-fluid-bg", {
-                yPercent: 15,
-                scrollTrigger: {
-                    trigger: ".luxury-editorial-section",
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: true
-                }
-            });
+                gsap.to("#lux-src-1", {
+                    scale: 1,
+                    yPercent: -8,
+                    scrollTrigger: {
+                        trigger: ".luxury-editorial-section",
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
+                    }
+                });
 
-            gsap.to("#lux-src-1", {
-                scale: 1,
-                yPercent: -8,
-                scrollTrigger: {
-                    trigger: ".luxury-editorial-section",
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: true
-                }
-            });
+                gsap.to("#lux-src-2", {
+                    scale: 1,
+                    yPercent: 8,
+                    scrollTrigger: {
+                        trigger: ".luxury-editorial-section",
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
+                    }
+                });
 
-            gsap.to("#lux-src-2", {
-                scale: 1,
-                yPercent: 8,
-                scrollTrigger: {
-                    trigger: ".luxury-editorial-section",
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: true
-                }
-            });
+                gsap.from(["#lux-meta", "#lux-title", "#lux-p", "#lux-btn"], {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1.2,
+                    stagger: 0.15,
+                    ease: "power4.out",
+                    scrollTrigger: {
+                        trigger: ".luxury-editorial-section",
+                        start: "top 65%",
+                        toggleActions: "play none none none"
+                    }
+                });
 
-            gsap.from(["#lux-meta", "#lux-title", "#lux-p", "#lux-btn"], {
-                opacity: 0,
-                y: 50,
-                duration: 1.2,
-                stagger: 0.15,
-                ease: "power4.out",
-                scrollTrigger: {
-                    trigger: ".luxury-editorial-section",
-                    start: "top 65%",
-                    toggleActions: "play none none none"
-                }
-            });
+                // --- BOTTOM HERO 1 REVEAL ANIMATIONS ---
+                gsap.to("#hero1-img-wrapper", {
+                    opacity: 1,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: ".hero1",
+                        start: "top 75%",
+                        toggleActions: "play none none none"
+                    }
+                });
 
-            // --- BOTTOM HERO 1 REVEAL ANIMATIONS ---
-            gsap.to("#hero1-img-wrapper", {
-                opacity: 1,
-                duration: 1,
-                scrollTrigger: {
-                    trigger: ".hero1",
-                    start: "top 75%",
-                    toggleActions: "play none none none"
-                }
-            });
+                gsap.to("#hero1-img", {
+                    scale: 1,
+                    scrollTrigger: {
+                        trigger: ".hero1",
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
+                    }
+                });
 
-            gsap.to("#hero1-img", {
-                scale: 1,
-                scrollTrigger: {
-                    trigger: ".hero1",
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: true
-                }
-            });
+                gsap.from("#hero1-title", {
+                    yPercent: 100,
+                    duration: 1.4,
+                    ease: "power4.out",
+                    scrollTrigger: {
+                        trigger: ".hero1",
+                        start: "top 60%",
+                        toggleActions: "play none none none"
+                    }
+                });
 
-            gsap.from("#hero1-title", {
-                yPercent: 100,
-                duration: 1.4,
-                ease: "power4.out",
-                scrollTrigger: {
-                    trigger: ".hero1",
-                    start: "top 60%",
-                    toggleActions: "play none none none"
-                }
-            });
+                gsap.to(["#hero1-subtitle", "#hero1-btn"], {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    stagger: 0.2,
+                    ease: "power4.out",
+                    scrollTrigger: {
+                        trigger: ".hero1",
+                        start: "top 55%",
+                        toggleActions: "play none none none"
+                    }
+                });
 
-            gsap.to(["#hero1-subtitle", "#hero1-btn"], {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                stagger: 0.2,
-                ease: "power4.out",
-                scrollTrigger: {
-                    trigger: ".hero1",
-                    start: "top 55%",
-                    toggleActions: "play none none none"
-                }
+                // --- HERO 2 REVEAL ANIMATIONS ---
+                gsap.to("#hero2-img-wrapper", {
+                    opacity: 1,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: ".hero2",
+                        start: "top 75%",
+                        toggleActions: "play none none none"
+                    }
+                });
+
+                gsap.to("#hero2-img", {
+                    scale: 1,
+                    scrollTrigger: {
+                        trigger: ".hero2",
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
+                    }
+                });
+
+                gsap.from("#hero2-title", {
+                    yPercent: 100,
+                    duration: 1.4,
+                    ease: "power4.out",
+                    scrollTrigger: {
+                        trigger: ".hero2",
+                        start: "top 60%",
+                        toggleActions: "play none none none"
+                    }
+                });
+
+                gsap.to(["#hero2-subtitle", "#hero2-btn"], {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    stagger: 0.2,
+                    ease: "power4.out",
+                    scrollTrigger: {
+                        trigger: ".hero2",
+                        start: "top 55%",
+                        toggleActions: "play none none none"
+                    }
+                });
+
+                // =======================
+                // GOOGLE APPS SCRIPT ORDER SYSTEM
+                // =======================
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlDqaMagZ-fguU4VbA9_0XBNM29K-M7eN_4MLUat0n9BiGJdMy-7shiwykAZ2foqFb/exec";
+
+                document.getElementById("checkoutForm").addEventListener("submit", async function (e) {
+                    e.preventDefault();
+
+                    if (cart.length === 0) {
+                        alert("Your cart is empty.");
+                        return;
+                    }
+
+                    const customerName = document.getElementById("customerName").value.trim();
+                    const customerEmail = document.getElementById("customerEmail").value.trim();
+                    const customerPhone = document.getElementById("customerPhone").value.trim();
+                    const customerAddress = document.getElementById("customerAddress").value.trim();
+
+                    let productList = "";
+                    cart.forEach(item => {
+                        productList += `${item.title}\nPrice : $${item.price}\n------------------------\n`;
+                    });
+
+                    const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+                    const orderData = {
+                        name: customerName,
+                        email: customerEmail,
+                        phone: customerPhone,
+                        address: customerAddress,
+                        products: productList,
+                        total: total.toFixed(2),
+                        orderTime: new Date().toLocaleString()
+                    };
+
+                    try {
+                        closeCartModal();
+                        cart = [];
+                        localStorage.removeItem("threadlab_cart");
+                        updateCartUI();
+                        document.getElementById("checkoutForm").reset();
+
+                        await fetch(SCRIPT_URL, {
+                            method: "POST",
+                            mode: "no-cors",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(orderData)
+                        });
+
+                        alert("✅ Order Submitted Successfully!");
+                    } catch (error) {
+                        console.error(error);
+                        alert("❌ Failed to send order.");
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>
