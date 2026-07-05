@@ -1415,19 +1415,16 @@
             }
 
             function initProducts() {
-                const grid1 = document.getElementById('product-grid');
-                const grid2 = document.getElementById('product-grid-extended');
-                const watchTrack = document.getElementById('watch-marquee-track');
+            const grid1 = document.getElementById('product-grid');
+            const grid2 = document.getElementById('product-grid-extended');
 
-                if (grid1) grid1.innerHTML = renderProductGrid(products.slice(0, 4), false);
-                if (grid2) grid2.innerHTML = renderProductGrid(products.slice(4, 8), true);
-
-                if (watchTrack) {
-                    const watchItems = products.slice(8, 12);
-                    const marqueeHTML = renderMarqueeItems(watchItems);
-                    watchTrack.innerHTML = marqueeHTML + marqueeHTML; // Seamless duplication
-                }
+            if (grid1) {
+                grid1.innerHTML = renderProductGrid(products.slice(0, 8), false);
             }
+            if (grid2) {
+                grid2.innerHTML = renderProductGrid(products.slice(8), true);
+            }
+        }
 
             // --- CART SYSTEM LOGIC ---
             function addToCart(productId) {
